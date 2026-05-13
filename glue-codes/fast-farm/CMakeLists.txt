@@ -31,9 +31,9 @@ add_executable(FAST.Farm
 target_link_libraries(FAST.Farm openfastlib_static wdlib awaelib)
 set_property(TARGET FAST.Farm PROPERTY LINKER_LANGUAGE Fortran)
 
-string(TOUPPER ${CMAKE_Fortran_COMPILER_ID} _compiler_id)
-string(TOUPPER ${CMAKE_BUILD_TYPE} _build_type)
-if (${_compiler_id} STREQUAL "GNU" AND NOT ${VARIABLE_TRACKING})
+string(TOUPPER "${CMAKE_Fortran_COMPILER_ID}" _compiler_id)
+string(TOUPPER "${CMAKE_BUILD_TYPE}" _build_type)
+if ("${_compiler_id}" STREQUAL "GNU" AND NOT ${VARIABLE_TRACKING})
   # With variable tracking enabled, the compile step frequently aborts on large modules and
   # restarts with this option off. Disabling avoids this problem when compiling with
   # full optimizations. However, variable tracking should be enabled when actively debugging

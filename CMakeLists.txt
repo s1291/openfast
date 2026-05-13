@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.28)
 project(OpenFAST CXX C Fortran)
 
 include(${CMAKE_SOURCE_DIR}/cmake/OpenfastCmakeUtils.cmake)

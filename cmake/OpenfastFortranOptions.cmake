@@ -41,21 +41,23 @@ macro(set_fast_fortran)
   get_filename_component(FCNAME "${CMAKE_Fortran_COMPILER}" NAME)
 
   # Abort if we do not have gfortran or Intel Fortran Compiler.
-  if (NOT (${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU" OR
-        ${CMAKE_Fortran_COMPILER_ID} MATCHES "^Intel" OR
-        ${CMAKE_Fortran_COMPILER_ID} STREQUAL "Flang"))
-    message(FATAL_ERROR "OpenFAST requires GFortran, Intel, or Flang Compiler. Compiler detected by CMake: ${FCNAME}.")
-  endif()
+   if (NOT ("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU" OR
+        "${CMAKE_Fortran_COMPILER_ID}" MATCHES "^Intel" OR
+        "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "Flang" OR
+        "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "LFortran" OR
+        "${FCNAME}" MATCHES "lfortran"))
+    message(FATAL_ERROR "OpenFAST requires GFortran, Intel, Flang, or LFortran Compiler. Compiler detected by CMake: ${FCNAME}.")
+  endif() 
 
   # Verify proper compiler versions are available
   # see https://github.com/OpenFAST/openfast/issues/88
-  if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
+  if("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU")
     if("${CMAKE_Fortran_COMPILER_VERSION}" STREQUAL "")
         message(WARNING "A version of GNU GFortran greater than 4.6.0 is required but CMake could not detect your GFortran version.")
     elseif("${CMAKE_Fortran_COMPILER_VERSION}" VERSION_LESS "4.6.0")  
-        message(FATAL_ERROR "A version of GNU GFortran greater than 4.6.0 is required. GFortran version detected by CMake: ${CMAKE_Fortran_COMPILER_VERSION}.")
+        message(FATAL_ERROR "A version of GNU GFortran greater than 4.6.0 is required. GFortran version detected by CMake: " ${CMAKE_Fortran_COMPILER_VERSION} ".")
     endif()
-  elseif(${CMAKE_Fortran_COMPILER_ID} MATCHES "^Intel")
+  elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "^Intel")
     if("${CMAKE_Fortran_COMPILER_VERSION}" VERSION_LESS "11")
       message(FATAL_ERROR "A version of Intel ifort greater than 11 is required. ifort version detected by CMake: ${CMAKE_Fortran_COMPILER_VERSION}.")
     endif()
@@ -64,14 +66,16 @@ macro(set_fast_fortran)
   # Force all .mod files to be stored in a single directory
   set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/ftnmods"
     CACHE STRING "Set the Fortran Modules directory" FORCE)
-  include_directories(${CMAKE_Fortran_MODULE_DIRECTORY})
+  include_directories("${CMAKE_Fortran_MODULE_DIRECTORY}")
 
   # Get OS/Compiler specific options
-  if (${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
+  if ("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU")
     set_fast_gfortran()
-  elseif(${CMAKE_Fortran_COMPILER_ID} MATCHES "^Intel")
+  elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "^Intel")
     set_fast_intel_fortran()
-  elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Flang")
+  elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "LFortran" OR "${FCNAME}" MATCHES "lfortran")
+    set_fast_lfortran()
+  elseif("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "Flang")
     set_fast_flang()
   endif()
 
@@ -146,6 +150,15 @@ macro(set_fast_gfortran)
   check_f2008_features()
 endmacro(set_fast_gfortran)
 
+macro(set_fast_lfortran)
+  # LFortran supports --cpp and -fPIC. It does NOT support gfortran-style -fdefault-real-8; rely on OPENFAST_DOUBLE_PRECISION define.
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --cpp -fPIC --implicit-interface --no-style-suggestions --fixed-form-infer --implicit-typing --legacy-array-sections")
+  
+  if (DOUBLE_PRECISION)
+    add_definitions(-DOPENFAST_DOUBLE_PRECISION)
+  endif()
+  add_definitions(-DLFORTRAN_COMPILER)
+endmacro()
 #
 # SET_FAST_INTEL_FORTRAN - Customizations for Intel Fortran Compiler
 #
@@ -166,7 +179,7 @@ macro(set_fast_intel_fortran_posix)
 
   # debug flags
   if(CMAKE_BUILD_TYPE MATCHES Debug)
-    if(${CMAKE_Fortran_COMPILER_ID} MATCHES "IntelLLVM")
+    if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "IntelLLVM")
       # NOTE: there is a bug in the 2024 and 2025 IFX compiler causing conflicts between the `check:uninit` and `-lm -ldl` flags
       #     When this is fixed in IFX, we will want to update this to check against versions before fix
       #     See here: https://community.intel.com/t5/Intel-Fortran-Compiler/ifx-IFX-2023-2-0-20230721-linker-problems-with-check-uninit/m-p/1527816
@@ -229,7 +242,7 @@ macro(set_fast_intel_fortran_windows)
 
   # debug flags
   if(CMAKE_BUILD_TYPE MATCHES Debug)
-    if(${CMAKE_Fortran_COMPILER_ID} MATCHES "IntelLLVM")
+    if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "IntelLLVM")
       set( CMAKE_Fortran_FLAGS_DEBUG "${CMAKE_Fortran_FLAGS_DEBUG} /check:all,noarg_temp_created,nouninit /traceback /Qinit=huge,infinity" )
     else()
       set( CMAKE_Fortran_FLAGS_DEBUG "${CMAKE_Fortran_FLAGS_DEBUG} /check:all,noarg_temp_created /traceback /Qinit=huge,infinity" )

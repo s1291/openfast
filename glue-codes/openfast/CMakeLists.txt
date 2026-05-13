@@ -20,8 +20,8 @@ add_executable(openfast src/FAST_Prog.f90)
 target_link_libraries(openfast openfastlib_static)
 set_target_properties(openfast PROPERTIES LINKER_LANGUAGE Fortran)
 
-string(TOUPPER ${CMAKE_Fortran_COMPILER_ID} _compiler_id)
-if (${_compiler_id} STREQUAL "GNU" AND NOT ${VARIABLE_TRACKING})
+string(TOUPPER "${CMAKE_Fortran_COMPILER_ID}" _compiler_id)
+if ("${_compiler_id}" STREQUAL "GNU" AND NOT "${VARIABLE_TRACKING}")
   # With variable tracking enabled, the compile step frequently aborts on large modules and
   # restarts with this option off. Disabling avoids this problem when compiling with
   # full optimizations. However, variable tracking should be enabled when actively debugging
