@@ -153,7 +153,7 @@ endmacro(set_fast_gfortran)
 macro(set_fast_lfortran)
   set(CMAKE_Fortran_MODDIR_FLAG "-J")     # CMake < 3.31 doesn't know this for LFortran
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --cpp -fPIC --implicit-interface --implicit-typing --fixed-form-infer --legacy-array-sections")
-  #set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --continue-compilation")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --no-style-suggestions")
 
   if (DOUBLE_PRECISION)
     add_definitions(-DOPENFAST_DOUBLE_PRECISION)
