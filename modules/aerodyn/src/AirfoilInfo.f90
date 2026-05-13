@@ -1718,7 +1718,7 @@ subroutine AFI_ComputeAirfoilCoefs1D( AOA, p, AFI_interp, errStat, errMsg, Table
    integer(IntKi), optional, intent(in   ) :: TableNum
    
    
-   real                                    :: IntAFCoefs(MaxNumAFCoeffs)                ! The interpolated airfoil coefficients.
+   real(ReKi)                              :: IntAFCoefs(MaxNumAFCoeffs)                ! The interpolated airfoil coefficients.
    real(reki)                              :: Alpha
    integer                                 :: s1
    integer                                 :: iTab

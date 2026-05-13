@@ -151,15 +151,16 @@ macro(set_fast_gfortran)
 endmacro(set_fast_gfortran)
 
 macro(set_fast_lfortran)
-  # LFortran supports --cpp and -fPIC. It does NOT support gfortran-style -fdefault-real-8; rely on OPENFAST_DOUBLE_PRECISION define.
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --cpp -fPIC --implicit-interface --no-style-suggestions --fixed-form-infer --implicit-typing --legacy-array-sections")
-  
+  set(CMAKE_Fortran_MODDIR_FLAG "-J")     # CMake < 3.31 doesn't know this for LFortran
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --cpp -fPIC --implicit-interface --implicit-typing --fixed-form-infer --legacy-array-sections")
+  #set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --continue-compilation")
+
   if (DOUBLE_PRECISION)
     add_definitions(-DOPENFAST_DOUBLE_PRECISION)
   endif()
   add_definitions(-DLFORTRAN_COMPILER)
 endmacro()
-#
+
 # SET_FAST_INTEL_FORTRAN - Customizations for Intel Fortran Compiler
 #
 macro(set_fast_intel_fortran)
