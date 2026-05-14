@@ -151,12 +151,14 @@ macro(set_fast_gfortran)
 endmacro(set_fast_gfortran)
 
 macro(set_fast_lfortran)
-  set(CMAKE_Fortran_MODDIR_FLAG "-J")     # CMake < 3.31 doesn't know this for LFortran
+  set(CMAKE_Fortran_MODDIR_FLAG "-J")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --cpp -fPIC --implicit-interface --implicit-typing --fixed-form-infer --legacy-array-sections")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --no-style-suggestions")
-
   if (DOUBLE_PRECISION)
     add_definitions(-DOPENFAST_DOUBLE_PRECISION)
+    # LFortran has no -fdefault-real-8 equivalent built into CMake yet, so
+    # add it here. This mirrors what set_fast_gfortran does for GFortran.
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fdefault-real-8 -fdefault-double-8")
   endif()
   add_definitions(-DLFORTRAN_COMPILER)
 endmacro()

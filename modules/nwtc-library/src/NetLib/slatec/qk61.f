@@ -194,9 +194,9 @@ c
       resasc = resasc*dhlgth
       abserr = abs((resk-resg)*hlgth)
       if(resasc.ne.0.0e+00.and.abserr.ne.0.0e+00)
-     *  abserr = resasc*amin1(0.1e+01,
+     *  abserr = resasc*min(0.1e+01,
      *  (0.2e+03*abserr/resasc)**1.5e+00)
-      if(resabs.gt.uflow/(0.5e+02*epmach)) abserr = amax1
+      if(resabs.gt.uflow/(0.5e+02*epmach)) abserr = max
      *  ((epmach*0.5e+02)*resabs,abserr)
       return
       end

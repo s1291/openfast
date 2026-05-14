@@ -78,7 +78,10 @@ function SPL_integrate(Omega,limits,ISSUCTION,   &
    d99      = real(d99all,    TNOKi)
    edgevel  = real(ABS(EdgeVelAll),TNOKi)
 
-   call slatec_qk61(f_int2,limits(1),limits(2),answer,abserr,resabs,resasc)
+   ! s.ouchene: replace with the next line
+   !call slatec_qk61(f_int2,limits(1),limits(2),answer,abserr,resabs,resasc)
+   call wrap_dqk61(f_int2, limits(1), limits(2), answer, abserr, resabs, resasc)
+
    integrand = real( answer, ReKi )
 
 end function SPL_integrate
